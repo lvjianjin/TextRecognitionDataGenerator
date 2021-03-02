@@ -2,7 +2,7 @@
 
 ## 介绍
 
-一个生成crnn训练数据集的工具，主要针对数字、简体中文。
+一个生成crnn训练数据集的工具，主要针对数字、简体中文。(crnn模型训练可参考此项目[crnn](https://github.com/lvjianjin/crnn))
 
 ## 示例
 ### 数字
