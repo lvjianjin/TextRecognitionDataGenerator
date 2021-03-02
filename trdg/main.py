@@ -10,7 +10,7 @@ class Generate:
 
     def __init__(self,
                  path='.',
-                 epoch=3,
+                 epoch=100,
                  batch=100,
                  blank=True,
                  max_length=18,
@@ -35,28 +35,36 @@ class Generate:
         # 最大字符数
         self.max_length = max_length
 
-    def gen_image(self):
+    def gen_image(self, dic=None):
         """
         生成图片
         """
         for i in range(self.epoch):
-            with open(self.dic, 'w') as f:
-                for j in range(self.batch):
-                    # 随机产生一个最大字符长度k
-                    num = random.randint(1, self.max_length)
-                    k = 10 ** num
-                    # 产生该随机数
-                    text = str(random.randint(1, k))
-                    bank_num = ''
-                    for char in text:
-                        # 加入空格
-                        rand_int = random.randint(0, 10)
-                        if rand_int > 9:
-                            bank_num += ' '
-                        elif rand_int > 7:
-                            bank_num += '  '
-                        bank_num += char
-                    f.writelines(bank_num + '\n')
+            if dic is None:
+                dictionary = self.dic
+                with open(self.dic, 'w', encoding="utf-8") as f:
+                    for j in range(self.batch):
+                        # 随机产生一个最大字符长度k
+                        num = random.randint(1, self.max_length)
+                        k = 10 ** num
+                        # 产生该随机数
+                        text = str(random.randint(1, k))
+                        bank_num = ''
+                        for char in text:
+                            # 加入空格
+                            rand_int = random.randint(0, 10)
+                            if rand_int > 7:
+                                bank_num += ' '
+                            bank_num += char
+                        f.writelines(bank_num + '\n')
+            else:
+                with open(dic, 'r', encoding="utf-8") as f:
+                    lines = f.readlines()
+                with open('temporary.txt', 'w', encoding="utf-8") as f:
+                    random_lines = random.choices(lines, k=self.batch)
+                    for line in random_lines:
+                        f.writelines(line + '\n')
+                dictionary = 'temporary.txt'
             font = random.choice(self.fonts)
             os.system(
                 """python {8} -c 100 -i {9} -sw {0} -k {1} -rk -bl 2 -rbl -b 3 -d 0 -f {2} \
@@ -64,7 +72,10 @@ class Generate:
                 --fit -t 8 -ft {7} -tc #000000,#FFFFFF --output_dir {10}""".format(
                     random.randint(0, 4), random.randint(0, 4), random.randint(28, 38), random.randint(0, 10),
                     random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), os.path.join(self.fonts_dir, font),
-                    self.run, self.dic, self.output_gen))
+                    self.run, dictionary, self.output_gen))
+            # 删除临时文件
+            if os.path.isfile('temporary.txt'):
+                os.remove('temporary.txt')
 
     def transform(self, output=None):
         """
@@ -89,9 +100,9 @@ class Generate:
 
 
 if __name__ == '__main__':
-    path = 'd:/python-project/TextRecognitionDataGenerator/trdg/'
-    gen = Generate(path)
+    project_path = 'd:/python-project/TextRecognitionDataGenerator/trdg/'
+    gen = Generate(path=project_path)
     # 生成图片
-    gen.gen_image()
+    gen.gen_image(dic=os.path.join(project_path, 'dicts/text.txt'))
     # 转换图片格式
     gen.transform()

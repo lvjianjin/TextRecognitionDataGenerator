@@ -2,8 +2,12 @@
 
 ## 介绍
 
-一个生成crnn训练数据集的工具，主要针对简体中文。
+一个生成crnn训练数据集的工具，主要针对数字、简体中文。
 
+数字示例，
+![number](./image/number.png "数字")
+中文示例，
+![chinese](./image/chinese.png "中文")
 ## 特性
 
 1. 本项目主要继承至[TextRecognitionDataGenerator](https://github.com/Belval/TextRecognitionDataGenerator) 。
@@ -19,6 +23,7 @@
 ## 近期更新
 
 **`2021-3-1`**: 初版上线，支持数字生成。
+**`2021-3-2`**: 支持简体中文生成及自定义语料。
 
 ## 内容
 
@@ -46,9 +51,14 @@ pip install -r requirements.txt
 
 将所准备的所有背景图片放置在./trdg/images/中。
 
+3. 自定义语料(可选，中文必选)
+
+准备形如./trdg/dicts/text.txt文件，并替换改文件。
+
 ### 生成
 
 修改./trdg/main.py中的path路径后，执行main.py文件即可生成图片。
+生成的图片位于./trdg/output/data/文件夹中。
 
 ## 联系
 
