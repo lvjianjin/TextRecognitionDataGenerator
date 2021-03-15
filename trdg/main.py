@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import random
 
@@ -10,7 +11,7 @@ class Generate:
 
     def __init__(self,
                  path='.',
-                 epoch=100,
+                 epoch=3,
                  batch=100,
                  blank=True,
                  max_length=18,
@@ -34,6 +35,11 @@ class Generate:
         self.output_tran = os.path.join(path, "output", "data")
         # 最大字符数
         self.max_length = max_length
+        # 操作系统
+        if 'win' in sys.platform:
+            self.dot = ""
+        else:
+            self.dot = "'"
 
     def gen_image(self, dic=None):
         """
@@ -67,12 +73,12 @@ class Generate:
                 dictionary = 'temporary.txt'
             font = random.choice(self.fonts)
             os.system(
-                """python {8} -c 100 -i {9} -sw {0} -k {1} -rk -bl 2 -rbl -b 3 -d 0 -f {2} \
+                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -bl 2 -rbl -b 3 -d 0 -f {2} \
                 --margins {3},{4},{5},{6} \
-                --fit -t 8 -ft {7} -tc #000000,#FFFFFF --output_dir {10}""".format(
+                --fit -t 8 -ft {7} -tc {12}#000000,#FFFFFF{12} --output_dir {10}""".format(
                     random.randint(0, 4), random.randint(0, 4), random.randint(28, 38), random.randint(0, 10),
                     random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), os.path.join(self.fonts_dir, font),
-                    self.run, dictionary, self.output_gen))
+                    self.run, dictionary, self.output_gen, self.batch, self.dot))
             # 删除临时文件
             if os.path.isfile('temporary.txt'):
                 os.remove('temporary.txt')
@@ -103,6 +109,6 @@ if __name__ == '__main__':
     project_path = 'd:/python-project/TextRecognitionDataGenerator/trdg/'
     gen = Generate(path=project_path)
     # 生成图片
-    gen.gen_image(dic=os.path.join(project_path, 'dicts/text.txt'))
+    gen.gen_image()
     # 转换图片格式
     gen.transform()
