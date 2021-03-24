@@ -17,10 +17,10 @@ class Generate:
                  max_length=18,
                  ):
         # 字体文件
-        self.fonts_dir = os.path.join(path, "fonts/num/")
+        self.fonts_dir = os.path.join(path, "fonts/cn/")
         self.fonts = os.listdir(self.fonts_dir)
         # 生成的语料路径
-        self.dic = os.path.join(path, "dicts/number.txt")
+        self.dic = os.path.join(path, "dicts/date.txt")
         # 生成批次
         self.epoch = epoch
         # 批次大小
@@ -40,6 +40,7 @@ class Generate:
             self.dot = ""
         else:
             self.dot = "'"
+        self.flag = 0
 
     def gen_image(self, dic=None):
         """
@@ -82,6 +83,7 @@ class Generate:
             # 删除临时文件
             if os.path.isfile('temporary.txt'):
                 os.remove('temporary.txt')
+            self.transform()
 
     def transform(self, output=None):
         """
@@ -91,24 +93,30 @@ class Generate:
             output_tran = output
         else:
             output_tran = self.output_tran
-        images = os.listdir(self.output_gen)
+        images = [file for file in os.listdir(self.output_gen) if file != 'labels.txt']
         if not os.path.exists(output_tran):
             os.mkdir(output_tran)
 
-        dic = set()
-        for i in range(len(images)):
-            text = images[i].split('_')[0]
-            for char in text:
-                dic.add(char)
-            shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}.jpg'.format(str(i))))
-            with open(os.path.join(output_tran, '{0}.txt'.format(str(i))), 'w', encoding='utf8') as f:
-                f.write(text.replace(' ', ''))
+        # 图片标签映射字典
+        with open(os.path.join(self.output_gen, 'labels.txt'), "r", encoding='utf8') as f:
+            lines = f.readlines()
+        dictionary = {}
+        for line in lines:
+            img = line.split(' ')[0]
+            label = line.split(' ')[1][:-1]
+            dictionary[img] = label
 
+        for i in range(len(images)):
+            text = dictionary[images[i]]
+            shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
+            with open(os.path.join(output_tran, '{0}_{1}.txt'.format(str(self.flag), str(i))), 'w', encoding='utf8') as f:
+                f.write(text.replace(' ', ''))
+        self.flag += 1
 
 if __name__ == '__main__':
     project_path = 'd:/python-project/TextRecognitionDataGenerator/trdg/'
     gen = Generate(path=project_path)
+    # 字典路径
+    path = os.path.join(project_path, 'dicts/date.txt')
     # 生成图片
-    gen.gen_image()
-    # 转换图片格式
-    gen.transform()
+    gen.gen_image(path)

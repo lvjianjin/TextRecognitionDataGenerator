@@ -185,7 +185,7 @@ def parse_arguments():
         "--name_format",
         type=int,
         help="Define how the produced files will be named. 0: [TEXT]_[ID].[EXT], 1: [ID]_[TEXT].[EXT] 2: [ID].[EXT] + one file labels.txt containing id-to-label mappings",
-        default=0,
+        default=2,
     )
     parser.add_argument(
         "-om",

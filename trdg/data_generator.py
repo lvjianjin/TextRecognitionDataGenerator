@@ -212,7 +212,6 @@ class FakeTextDataGenerator(object):
         #####################################
         # Generate name for resulting image #
         #####################################
-        #text = text.replace('?','ylz001').replace('*','ylz002').replace('/','ylz003').replace("\\",'ylz004').replace('<','ylz005').replace('>','ylz006').replace(':','ylz007').replace('"','ylz008').replace('|','ylz009')
         if name_format == 0:
             image_name = "{}_{}.{}".format(text, str(index), extension)
             mask_name = "{}_{}_mask.png".format(text, str(index))
