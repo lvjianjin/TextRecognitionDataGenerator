@@ -12,15 +12,15 @@ class Generate:
     def __init__(self,
                  path='.',
                  epoch=3,
-                 batch=100,
+                 batch=20,
                  blank=True,
-                 max_length=18,
+                 max_length=25,
                  ):
         # 字体文件
         self.fonts_dir = os.path.join(path, "fonts/cn/")
         self.fonts = os.listdir(self.fonts_dir)
         # 生成的语料路径
-        self.dic = os.path.join(path, "dicts/date.txt")
+        self.dic = os.path.join(path, "dicts/text.txt")
         # 生成批次
         self.epoch = epoch
         # 批次大小
@@ -32,7 +32,9 @@ class Generate:
         # 生成结果保存路径
         self.output_gen = os.path.join(path, "output", "generate")
         # 转换后结果保存路径
-        self.output_tran = os.path.join(path, "output", "data")
+        self.output_tran = os.path.join(path, "output", "image")
+        # 保存路径
+        self.output = os.path.join(path, "output")
         # 最大字符数
         self.max_length = max_length
         # 操作系统
@@ -47,6 +49,7 @@ class Generate:
         生成图片
         """
         for i in range(self.epoch):
+            print('开始生成第{0}轮数据...'.format(str(i)))
             if dic is None:
                 dictionary = self.dic
                 with open(self.dic, 'w', encoding="utf-8") as f:
@@ -74,7 +77,7 @@ class Generate:
                 dictionary = 'temporary.txt'
             font = random.choice(self.fonts)
             os.system(
-                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -bl 2 -rbl -b 3 -d 0 -f {2} \
+                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -bl 1 -rbl -b 3 -d 0 -f {2} \
                 --margins {3},{4},{5},{6} \
                 --fit -t 8 -ft {7} -tc {12}#000000,#FFFFFF{12} --output_dir {10}""".format(
                     random.randint(0, 4), random.randint(0, 4), random.randint(28, 38), random.randint(0, 10),
@@ -83,7 +86,7 @@ class Generate:
             # 删除临时文件
             if os.path.isfile('temporary.txt'):
                 os.remove('temporary.txt')
-            self.transform()
+            self.transform(self.output_tran)
 
     def transform(self, output=None):
         """
@@ -103,20 +106,21 @@ class Generate:
         dictionary = {}
         for line in lines:
             img = line.split(' ')[0]
-            label = line.split(' ')[1][:-1]
+            label = ''.join(line.split(' ')[1:])[:-1]
             dictionary[img] = label
+        with open(os.path.join(self.output, 'label.txt'), "a", encoding='utf8') as f:
+            for i in range(len(images)):
+                text = dictionary[images[i]]
+                shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
+                #with open(os.path.join(output_tran, '{0}_{1}.txt'.format(str(self.flag), str(i))), 'w', encoding='utf8') as f:
+                f.write('gendata/lsvt_genetare/{0}_{1}.txt\t'.format(str(self.flag), str(i)) + text.replace(' ', '')+'\n')
+            self.flag += 1
 
-        for i in range(len(images)):
-            text = dictionary[images[i]]
-            shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
-            with open(os.path.join(output_tran, '{0}_{1}.txt'.format(str(self.flag), str(i))), 'w', encoding='utf8') as f:
-                f.write(text.replace(' ', ''))
-        self.flag += 1
 
 if __name__ == '__main__':
-    project_path = 'd:/python-project/TextRecognitionDataGenerator/trdg/'
+    project_path = '../trdg/'
     gen = Generate(path=project_path)
     # 字典路径
-    path = os.path.join(project_path, 'dicts/date.txt')
+    path = os.path.join(project_path, 'dicts/text.txt')
     # 生成图片
     gen.gen_image(path)
