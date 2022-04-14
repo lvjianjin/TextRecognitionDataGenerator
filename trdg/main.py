@@ -11,8 +11,8 @@ class Generate:
 
     def __init__(self,
                  path='.',
-                 epoch=3,
-                 batch=20,
+                 epoch=5,
+                 batch=10,
                  blank=True,
                  max_length=25,
                  ):
@@ -77,11 +77,11 @@ class Generate:
                 dictionary = 'temporary.txt'
             font = random.choice(self.fonts)
             os.system(
-                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -bl 1 -rbl -b 3 -d 0 -f {2} \
+                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -b 3 -d 0 -f {2} \
                 --margins {3},{4},{5},{6} \
                 --fit -t 8 -ft {7} -tc {12}#000000,#FFFFFF{12} --output_dir {10}""".format(
-                    random.randint(0, 4), random.randint(0, 4), random.randint(28, 38), random.randint(0, 10),
-                    random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), os.path.join(self.fonts_dir, font),
+                    random.randint(0, 4), random.randint(0, 4), random.randint(32, 38), random.randint(0, 5),
+                    random.randint(0, 5), random.randint(0, 5), random.randint(0, 5), os.path.join(self.fonts_dir, font),
                     self.run, dictionary, self.output_gen, self.batch, self.dot))
             # 删除临时文件
             if os.path.isfile('temporary.txt'):
@@ -112,8 +112,7 @@ class Generate:
             for i in range(len(images)):
                 text = dictionary[images[i]]
                 shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
-                #with open(os.path.join(output_tran, '{0}_{1}.txt'.format(str(self.flag), str(i))), 'w', encoding='utf8') as f:
-                f.write('gendata/lsvt_genetare/{0}_{1}.txt\t'.format(str(self.flag), str(i)) + text.replace(' ', '')+'\n')
+                f.write('gendata/image/{0}_{1}.txt\t'.format(str(self.flag), str(i)) + text.replace(' ', '')+'\n')
             self.flag += 1
 
 
@@ -121,6 +120,6 @@ if __name__ == '__main__':
     project_path = '../trdg/'
     gen = Generate(path=project_path)
     # 字典路径
-    path = os.path.join(project_path, 'dicts/text.txt')
+    path = os.path.join(project_path, 'dicts/medical.txt')
     # 生成图片
     gen.gen_image(path)
