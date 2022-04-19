@@ -10,12 +10,14 @@ class Generate:
     """
 
     def __init__(self,
+                 name='test',
                  path='.',
-                 epoch=5,
+                 epoch=3,
                  batch=10,
                  blank=True,
                  max_length=25,
                  ):
+        self.name = name
         # 字体文件
         self.fonts_dir = os.path.join(path, "fonts/cn/")
         self.fonts = os.listdir(self.fonts_dir)
@@ -32,7 +34,7 @@ class Generate:
         # 生成结果保存路径
         self.output_gen = os.path.join(path, "output", "generate")
         # 转换后结果保存路径
-        self.output_tran = os.path.join(path, "output", "image")
+        self.output_tran = os.path.join(path, "output", self.name)
         # 保存路径
         self.output = os.path.join(path, "output")
         # 最大字符数
@@ -77,12 +79,21 @@ class Generate:
                 dictionary = 'temporary.txt'
             font = random.choice(self.fonts)
             os.system(
-                """python {8} -c {11} -i {9} -sw {0} -k {1} -rk -b 3 -d 0 -f {2} \
-                --margins {3},{4},{5},{6} \
-                --fit -t 8 -ft {7} -tc {12}#000000,#FFFFFF{12} --output_dir {10}""".format(
-                    random.randint(0, 4), random.randint(0, 4), random.randint(32, 38), random.randint(0, 5),
-                    random.randint(0, 5), random.randint(0, 5), random.randint(0, 5), os.path.join(self.fonts_dir, font),
-                    self.run, dictionary, self.output_gen, self.batch, self.dot))
+                """python {0} -c {1} -i {2} -sw {3} -k {4} -rk -b 3 -d 0 -bl {5} -f {6} \
+                --margins {7},{8},{9},{10} \
+                --fit -t 8 -ft {11} -tc {12}#000000,#FFFFFF{12} --output_dir {13}""".format(self.run, self.batch,
+                                                                                            dictionary,
+                                                                                            random.randint(0, 4),
+                                                                                            random.randint(0, 4),
+                                                                                            random.randint(0, 1),
+                                                                                            random.randint(32, 38),
+                                                                                            random.randint(0, 5),
+                                                                                            random.randint(0, 5),
+                                                                                            random.randint(0, 5),
+                                                                                            random.randint(0, 5),
+                                                                                            os.path.join(self.fonts_dir,
+                                                                                                         font),
+                                                                                            self.dot, self.output_gen))
             # 删除临时文件
             if os.path.isfile('temporary.txt'):
                 os.remove('temporary.txt')
@@ -108,18 +119,19 @@ class Generate:
             img = line.split(' ')[0]
             label = ''.join(line.split(' ')[1:])[:-1]
             dictionary[img] = label
-        with open(os.path.join(self.output, 'label.txt'), "a", encoding='utf8') as f:
+        with open(os.path.join(self.output, '{0}.txt'.format(self.name)), "a", encoding='utf8') as f:
             for i in range(len(images)):
                 text = dictionary[images[i]]
-                shutil.move(os.path.join(self.output_gen, images[i]), os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
-                f.write('gendata/image/{0}_{1}.txt\t'.format(str(self.flag), str(i)) + text.replace(' ', '')+'\n')
+                shutil.move(os.path.join(self.output_gen, images[i]),
+                            os.path.join(output_tran, '{0}_{1}.jpg'.format(str(self.flag), str(i))))
+                f.write('gendata/{0}/{1}_{2}.jpg\t'.format(self.name, str(self.flag), str(i)) + text + '\n')
             self.flag += 1
 
 
 if __name__ == '__main__':
     project_path = '../trdg/'
-    gen = Generate(path=project_path)
+    gen = Generate(name='test', epoch=3, batch=20, path=project_path)
     # 字典路径
-    path = os.path.join(project_path, 'dicts/medical.txt')
+    path = os.path.join(project_path, 'dicts/text.txt')
     # 生成图片
     gen.gen_image(path)
